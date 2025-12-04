@@ -7,18 +7,11 @@ namespace Application.Features.Jira.Queries;
 //GetTopUsersData
 public record GetTopUsersDataQuery(string ProjectKey) : IRequest<TopUsersDto>;
 
-public class GetTopUsersDataQueryHandler : IRequestHandler<GetTopUsersDataQuery, TopUsersDto>
+public class GetTopUsersDataQueryHandler(IJiraClient jiraClient) : IRequestHandler<GetTopUsersDataQuery, TopUsersDto>
 {
-    private readonly IJiraClient _jiraClient;
-
-    public GetTopUsersDataQueryHandler(IJiraClient jiraClient)
-    {
-        _jiraClient = jiraClient;
-    }
-
     public async Task<TopUsersDto> Handle(GetTopUsersDataQuery request, CancellationToken cancellationToken)
     {
-        var response = await _jiraClient.GetTopUsersDataAsync(request.ProjectKey);
+        var response = await jiraClient.GetTopUsersDataAsync(request.ProjectKey);
         
         // Count tasks per user as reporter and assignee
         var userStats = new Dictionary<string, (int ReporterCount, int AssigneeCount)>();

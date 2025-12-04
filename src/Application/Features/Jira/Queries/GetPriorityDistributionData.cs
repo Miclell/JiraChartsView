@@ -7,18 +7,12 @@ namespace Application.Features.Jira.Queries;
 //GetPriorityDistributionData
 public record GetPriorityDistributionDataQuery(string ProjectKey) : IRequest<PriorityDistributionDto>;
 
-public class GetPriorityDistributionDataQueryHandler : IRequestHandler<GetPriorityDistributionDataQuery, PriorityDistributionDto>
+public class GetPriorityDistributionDataQueryHandler(IJiraClient jiraClient)
+    : IRequestHandler<GetPriorityDistributionDataQuery, PriorityDistributionDto>
 {
-    private readonly IJiraClient _jiraClient;
-
-    public GetPriorityDistributionDataQueryHandler(IJiraClient jiraClient)
-    {
-        _jiraClient = jiraClient;
-    }
-
     public async Task<PriorityDistributionDto> Handle(GetPriorityDistributionDataQuery request, CancellationToken cancellationToken)
     {
-        var response = await _jiraClient.GetPriorityDistributionDataAsync(request.ProjectKey);
+        var response = await jiraClient.GetPriorityDistributionDataAsync(request.ProjectKey);
         
         var distribution = response.Issues
             .Where(x => x.Fields.Priority != null)

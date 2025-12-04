@@ -17,7 +17,7 @@ public class JiraAnalyticsController(IMediator mediator) : ControllerBase
         var result = await mediator.Send(query);
         return Ok(result);
     }
-
+                                            
     [HttpGet("status-time-distribution")]
     public async Task<ActionResult<StatusTimeDistributionDto>> GetStatusTimeDistribution(string projectKey)
     {

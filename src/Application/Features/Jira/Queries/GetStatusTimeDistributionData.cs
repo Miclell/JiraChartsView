@@ -8,18 +8,12 @@ namespace Application.Features.Jira.Queries;
 //GetStatusTimeDistributionData
 public record GetStatusTimeDistributionDataQuery(string ProjectKey) : IRequest<StatusTimeDistributionDto>;
 
-public class GetStatusTimeDistributionDataQueryHandler : IRequestHandler<GetStatusTimeDistributionDataQuery, StatusTimeDistributionDto>
+public class GetStatusTimeDistributionDataQueryHandler(IJiraClient jiraClient)
+    : IRequestHandler<GetStatusTimeDistributionDataQuery, StatusTimeDistributionDto>
 {
-    private readonly IJiraClient _jiraClient;
-
-    public GetStatusTimeDistributionDataQueryHandler(IJiraClient jiraClient)
-    {
-        _jiraClient = jiraClient;
-    }
-
     public async Task<StatusTimeDistributionDto> Handle(GetStatusTimeDistributionDataQuery request, CancellationToken cancellationToken)
     {
-        var issues = await _jiraClient.GetStatusTimeDistributionDataAsync(request.ProjectKey);
+        var issues = await jiraClient.GetStatusTimeDistributionDataAsync(request.ProjectKey);
         
         var result = new StatusTimeDistributionDto
         {
@@ -39,7 +33,7 @@ public class GetStatusTimeDistributionDataQueryHandler : IRequestHandler<GetStat
             
             if (!isClosed) continue;
             
-            var changelog = await _jiraClient.GetIssueChangelogAsync(issue.Key);
+            var changelog = await jiraClient.GetIssueChangelogAsync(issue.Key);
             var statusChanges = ExtractStatusChanges(issue, changelog);
             
             result.Issues.Add(new IssueStatusTimeDto

@@ -7,19 +7,13 @@ namespace Application.Features.Jira.Queries;
 
 public record GetWorklogHistogramDataQuery(string ProjectKey) : IRequest<WorklogHistogramDto>;
 
-public class GetWorklogHistogramDataQueryHandler : IRequestHandler<GetWorklogHistogramDataQuery, WorklogHistogramDto>
+public class GetWorklogHistogramDataQueryHandler(IJiraClient jiraClient)
+    : IRequestHandler<GetWorklogHistogramDataQuery, WorklogHistogramDto>
 {
-    private readonly IJiraClient _jiraClient;
-
-    public GetWorklogHistogramDataQueryHandler(IJiraClient jiraClient)
-    {
-        _jiraClient = jiraClient;
-    }
-
     public async Task<WorklogHistogramDto> Handle(GetWorklogHistogramDataQuery request, CancellationToken cancellationToken)
     {
         // Get closed tasks - use open time histogram endpoint which already has created and resolutiondate
-        var issues = await _jiraClient.GetOpenTimeHistogramDataAsync(request.ProjectKey);
+        var issues = await jiraClient.GetOpenTimeHistogramDataAsync(request.ProjectKey);
         
         if (issues?.Issues == null || issues.Issues.Count == 0)
         {
